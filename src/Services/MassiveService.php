@@ -38,25 +38,7 @@ class MassiveService
     public function getFunctionalities($args)
     {
         $functionality = $args['functionality'] ?? null;
-        $fields = $args['fields'] ?? false;
-
         $response = $this->configurationService->getFunctionalities($functionality);
-
-        if ($fields && $functionality) {
-            $models = $this->getModelsGlobally($args);
-
-
-            foreach ($response['entities'] as $entity) {
-                if (array_key_exists($entity['entity'], $models)) {
-                    $index = array_search($entity, array_column($response['entities'], 'entity'));
-                    dd($response['entities'], $index);
-
-                    dd($index);
-                    $response['entities'][$entity]['fields'] = $models[$entity]['fields'];
-                }
-            }
-
-        }
 
         return $response;
     }
