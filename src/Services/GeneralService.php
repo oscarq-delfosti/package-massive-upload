@@ -2,32 +2,10 @@
 
 namespace Delfosti\Massive\Services;
 
-use Illuminate\Support\Facades\Log;
-use Throwable;
+use DateTime;
 
 class GeneralService
 {
-
-    function logDebug(Throwable $exception, array $extra = null)
-    {
-        try {
-            Log::debug(
-                $exception->getMessage(),
-                [
-                    'Trace' => "
-                    'File' => {$exception->getTrace()[0]['file']},
-                    'Line' => {$exception->getTrace()[0]['line']},
-                    'Function' => {$exception->getTrace()[0]['function']},
-                    'Class' => {$exception->getTrace()[0]['class']},
-                    'Type' => {$exception->getTrace()[0]['type']}
-                    ",
-                    'extra' => $extra ?? 'El mejor CMS',
-                ]
-            );
-        } catch (Throwable $exception) {
-            Log::emergency('Hay problemas con los logs: ', [$exception->getMessage()]);
-        }
-    }
 
     public function capitalizeEntity(string $entity)
     {
@@ -42,31 +20,24 @@ class GeneralService
         return $entity;
     }
 
-    public function processResponse($data, $message = "", $status = true, $code = 200)
+    public function processResponse($data)
     {
+        $response = [];
 
-        $response['message'] = $message;
-        $response['status'] = $status;
-        $response['code'] = $code;
-
-        if ($data) {
-
-            if (count($data['confirmed']) == 0) {
-                $message = "No item has been confirmed";
-                $status = false;
-                $code = 400;
-            } else if (count($data['confirmed']) > 0 && (count($data['invalid']) > 0 || count($data['failed']) > 0)) {
-                $message = "Some items have not been confirmed";
-            } else if (count($data['confirmed']) > 0 && (count($data['invalid']) == 0 || count($data['failed']) == 0)) {
-                $message = "All items confirmed";
-            }
-
-            $data['totalConfirmed'] = count($data['confirmed']);
-            $data['totalInvalid'] = count($data['invalid']);
-            $data['totalFailed'] = count($data['failed']);
-
-            $response['items'] = $data;
+        if (count($data['confirmed']) == 0) {
+            $response["message"] = "No item has been confirmed";
+            $response["status"] = false;
+            $response["code"] = 400;
+        } else if (count($data['confirmed']) > 0 && count($data['failed']) > 0) {
+            $response["message"] = "Some items have not been confirmed";
+        } else if (count($data['confirmed']) > 0 && count($data['failed']) == 0) {
+            $response["message"] = "All items confirmed";
         }
+
+        $response['totalConfirmed'] = count($data['confirmed']);
+        $response['totalFailed'] = count($data['failed']);
+
+        $response['items'] = $data;
 
         return $response;
 
@@ -83,4 +54,72 @@ class GeneralService
 
     }
 
+    public function removeDiferentKeys($model, &$item)
+    {
+
+        foreach ($item as $key => $i) {
+            if (array_search($key, $model) === false) {
+                unset($item[$key]);
+            }
+        }
+
+    }
+
+    public function sortAssociativeArray(&$array, $sortBy)
+    {
+
+        foreach ($array as $key => $row) {
+            $aux[$key] = $row[$sortBy];
+        }
+
+        array_multisort($aux, SORT_ASC, $array);
+    }
+
+    public function filterDate(&$query, $args)
+    {
+        $date_field = $args['date_field'] ?? 'created_at';
+        $date = $args['date'] ?? null;
+        $date_end = $args['date_end'] ?? null;
+
+        if ($date && $date_end === null) {
+            $date_time = strtotime($date);
+            $date = new DateTime(date('Y-m-d\T', $date_time) . '00:00:00');
+            $date_end = new DateTime(date('Y-m-d\T', $date_time) . '23:59:59');
+            $query->whereBetween($date_field, [$date, $date_end]);
+        } elseif ($date === null && $date_end) {
+            $date_end = !empty($date_end) ? new DateTime($date_end) : null;
+            $query->where($date_field, '<=', $date_end);
+        } elseif ($date && $date_end) {
+            $date = !empty($date) ? new DateTime($date) : null;
+            $date_end = !empty($date_end) ? new DateTime($date_end . '+1 day') : null;
+            $query->whereBetween($date_field, [$date, $date_end]);
+        }
+    }
+
+    public function processOutput($code, $response = null, $structure = null, $errors = null)
+    {
+        $output = [
+            'code' => $code,
+            'status' => (! $errors && $response) ? 'success' : 'fail',
+            'data' => $response,
+        ];
+
+        // Structure
+        if ($structure) {
+            if (is_bool($structure)) {
+                unset($output['data']);
+                $output['structure'] = $response;
+            } else {
+                $output['structure'] = $structure;
+            }
+        }
+
+        // Errors
+        if ($errors) {
+            unset($output['data']);
+            $output['errors'] = $response;
+        }
+
+        return response()->json($output, $code);
+    }
 }

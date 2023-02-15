@@ -18,6 +18,15 @@ class MassiveServiceProvider extends ServiceProvider
 
         // Controllers
         $this->app->make('Delfosti\Massive\Controllers\MassiveController');
+        $this->app->make('Delfosti\Massive\Controllers\MassiveUploadLogController');
+
+        // Migrations
+        $this->loadMigrationsFrom(__DIR__.'/Database/migrations');
+
+        // Config files
+        $this->publishes([
+            __DIR__ . '/Config/massiveupload.php' => config_path('massiveupload.php'),
+        ]);
     }
 
     /**
