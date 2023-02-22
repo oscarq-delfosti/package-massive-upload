@@ -2,13 +2,9 @@
 
 return [
     'application' => [
-        // monolith - microservices
-        'architecture' => 'microservices',
-        // http://127.0.0.1:8000
+        'architecture' => '',
         'orchestrator' => '',
-        'microservices' => [
-            //'http://127.0.0.1:8001',
-        ]
+        'microservices' => []
     ],
     'functionalities' => [
         [
