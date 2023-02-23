@@ -23,10 +23,6 @@ class MassiveServiceProvider extends ServiceProvider
         // Migrations
         $this->loadMigrationsFrom(__DIR__.'/Database/migrations');
 
-        // Config files
-        $this->publishes([
-            __DIR__ . '/Config/massiveupload.php' => config_path('massiveupload.php'),
-        ]);
     }
 
     /**
@@ -36,6 +32,9 @@ class MassiveServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        // Config files
+        $this->publishes([
+            __DIR__ . '/Config/massiveupload.php' => config_path('massiveupload.php'),
+        ]);
     }
 }
