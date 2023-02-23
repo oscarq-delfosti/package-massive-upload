@@ -32,7 +32,7 @@ class MassiveServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $path = realpath(__DIR__ . '/../config/massiveupload.php');
+        $path = realpath(__DIR__ . '/Config/massiveupload.php');
 
         // Config files
         $this->publishes([
