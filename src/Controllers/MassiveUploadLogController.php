@@ -1,6 +1,6 @@
 <?php
 
-namespace Delfosti\Massive\Http\Controllers;
+namespace Delfosti\Massive\Controllers;
 
 use Error;
 use Illuminate\Http\Request;
