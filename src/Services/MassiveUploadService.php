@@ -736,14 +736,24 @@ class MassiveUploadService
 
                                 $id = $parent[$entity['search_by']];
 
-                                $response = DB::table($models[$entity['entity']]['table_name'])
-                                    ->where($entity['search_by'], $id)
-                                    ->update([
-                                        'deleted_at' => now()
-                                    ]);
+                                if (array_key_exists('delete', $action) && $action['delete'] != "") {
+                                    if ($action['delete'] == "physically") {
+                                        DB::table($models[$entity['entity']]['table_name'])
+                                            ->where($entity['search_by'], $id)
+                                            ->delete();
+                                    }
 
-                                if (!$response) {
-                                    $errors += 1;
+                                    if ($action['delete'] == "logically") {
+                                        DB::table($models[$entity['entity']]['table_name'])
+                                            ->where($entity['search_by'], $id)
+                                            ->update([
+                                                'deleted_at' => now()
+                                            ]);
+                                    }
+                                } else {
+                                    DB::table($models[$entity['entity']]['table_name'])
+                                        ->where($entity['search_by'], $id)
+                                        ->delete();
                                 }
                             }
                         }

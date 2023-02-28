@@ -8,7 +8,7 @@ class ModelService
 {
 
     const PATH = '\App\Models\\';
-    const MODELS_FOLDER_PATH = '..\..\App\Models\\';
+    const MODELS_FOLDER_PATH = '..\..\..\..\..\App\Models\\';
 
     public function getModels()
     {

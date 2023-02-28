@@ -100,8 +100,6 @@ class MassiveUploadLogService
         $massiveUploadLog->user_id = $args["user_id"];
 
         $massiveUploadLog->save();
-
-        return $massiveUploadLog;
     }
 
     private function filters(&$query, $args)

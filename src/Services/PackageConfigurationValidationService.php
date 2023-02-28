@@ -46,6 +46,7 @@ class PackageConfigurationValidationService
                 'actions' => 'required|array',
                 'actions.*.action' => 'required',
                 'actions.*.type' => 'required|in:create,update,delete',
+                'actions.*.delete' => 'in:physically,logically',
                 'actions.*.friendly_name' => 'required',
                 'actions.*.entities' => 'required|array',
                 'actions.*.entities.*.entity' => 'required',

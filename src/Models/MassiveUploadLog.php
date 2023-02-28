@@ -7,5 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class MassiveUploadLog extends Model
 {
+    protected $table = "massive_upload_log";
+
+    protected $fillable = [
+        'id',
+        'action',
+        'entities',
+        'upload_status',
+        'items',
+        'user_id'
+    ];
+
     use HasFactory;
 }
