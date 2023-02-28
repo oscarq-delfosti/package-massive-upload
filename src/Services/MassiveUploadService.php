@@ -119,7 +119,7 @@ class MassiveUploadService
                     $responseModelsMicroservice = $this->modelService->getModels();
                 } else {
                     $response = (new ApiService($microservice))->get('api', 'massive-upload', 'get-models');
-                    $responseModelsMicroservice = $response['data'];
+                    $responseModelsMicroservice = $response['data']->data;
                 }
 
                 foreach ($responseModelsMicroservice as $key => $model) {
