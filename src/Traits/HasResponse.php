@@ -26,6 +26,23 @@ trait HasResponse
 
     }
 
+    public function successResponse($data, $message = null, $code = 200)
+    {
+
+        $response["message"] = $message ?? "OK";
+        $response["data"] = collect($data)->toArray();
+
+        return response()->json($response, $code);
+    }
+
+    public function exceptionResponse($message, $line, $code)
+    {
+        $data["message"] = $message ?? "OK";
+        $data["line"] = $line;
+
+        return response()->json($data, $code);
+    }
+
     public function validationErrorResponse($errors)
     {
         $structure = [];

@@ -2,18 +2,13 @@
 
 namespace Delfosti\Massive\Services;
 
-use Throwable;
+use ErrorException;
 
 class ModelService
 {
-    private $generalService;
+
     const PATH = '\App\Models\\';
     const MODELS_FOLDER_PATH = '..\..\App\Models\\';
-
-    public function __construct()
-    {
-        $this->generalService = new GeneralService();
-    }
 
     public function getModels()
     {
@@ -25,42 +20,52 @@ class ModelService
             $fileName = explode('.', $file);
 
             if ($fileName[1] == "php") {
-                $models[$fileName[0]] = $this->getModel($fileName[0]);
+                $models[$fileName[0]] = $this->getModelProperty($fileName[0]);
             }
         }
 
         return $models;
     }
 
-    public function getModel(string $model_name, string $property = "massiveUpload")
+    public function getModel(string $modelName)
+    {
+        return self::getPath($modelName);
+    }
+
+    public function getModelProperty(string $modelName, $property = "massiveUpload")
     {
         try {
-            $model = self::getPath($model_name);
+
+            $model = self::getPath($modelName);
             return get_object_vars(new $model)[$property];
-        } catch (Throwable $exception) {
-            return null;
+
+        } catch (ErrorException $ex) {
+            return [];
         }
     }
 
-    public function getPath(string $model_name, string $site_id = null)
+    public function getPath(string $modelName, string $siteId = null)
     {
-        try {
-            if ($site_id) {
-                return self::PATH . $site_id . '\\' . $model_name;
-            } else {
-                return self::PATH . $model_name;
-            }
-        } catch (Throwable $exception) {
-            return null;
+        if ($siteId) {
+            return self::PATH . $siteId . '\\' . $modelName;
+        } else {
+            return self::PATH . $modelName;
         }
     }
 
-    public function filterFieldsByFillable(&$fields, $fillable)
+    public function getTable($model)
     {
-        foreach ($fields as $key => $field) {
-            if (!in_array($key, $fillable)) {
-                unset($fields[$key]);
-            }
-        }
+        return $model['table_name'];
     }
+
+    public function getFields($model)
+    {
+        return $model['fields'];
+    }
+
+    public function getValidations($model, $action)
+    {
+        return $model['validations'][$action];
+    }
+
 }

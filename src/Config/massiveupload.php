@@ -2,80 +2,40 @@
 
 return [
     'application' => [
-        'architecture' => '',
+        'architecture' => 'monolith',
         'orchestrator' => '',
         'microservices' => []
     ],
-    'functionalities' => [
+    'actions' => [
         [
-            'action' => 'create',
+            'action' => 'register_clients',
             'type' => 'create',
-            'friendly_name' => 'Create',
+            'friendly_name' => 'Registrar clientes',
             'entities' => [
                 [
-                    'entity' => 'ParentEntity',
+                    'entity' => '',
                     'order' => 1,
                     'type' => 'parent',
-                    'finders' => [
-                        [
-                            'entity' => 'Entity',
-                            'search_by' => '',
-                            'fk_column' => ''
+                    'created' => 'user_id',
+                    'foreign_keys' => [
+                        'in_flow' => [
+                            'Entity' => 'field'
+                        ],
+                        'out_flow' => [
+                            [
+                                'entity' => 'Client',
+                                'search_by' => 'ruc',
+                                'fk_column' => 'client_id'
+                            ]
                         ]
+                    ],
+                    'fields' => [],
+                    'validations' => [
+                        'create' => [],
+                        'update' => [],
+                        'delete' => []
                     ]
                 ],
-                [
-                    'entity' => 'ChildEntity',
-                    'order' => 2,
-                    'type' => 'child',
-                    'finders' => [
-                        [
-                            'entity' => 'Entity',
-                            'search_by' => '',
-                            'fk_column' => ''
-                        ]
-                    ]
-                ]
-            ]
-        ],
-        [
-            'action' => 'update',
-            'type' => 'update',
-            'friendly_name' => 'Update',
-            'entities' => [
-                [
-                    'entity' => 'ParentEntity',
-                    'order' => 1,
-                    'type' => 'parent',
-                    'search_by (required)' => '',
-                    'finders' => [
-                        [
-                            'entity' => 'Entity',
-                            'search_by' => '',
-                            'fk_column' => ''
-                        ]
-                    ]
-                ]
-            ]
-        ],
-        [
-            'action' => 'delete',
-            'type' => 'delete',
-            'friendly_name' => 'Delete',
-            'entities' => [
-                [
-                    'entity' => 'ParentEntity',
-                    'order' => 1,
-                    'type' => 'parent',
-                    'search_by (required)' => '',
-                    'finders' => [
-                        [
-                            'entity' => 'Entity',
-                            'search_by' => '',
-                            'fk_column' => ''
-                        ]
-                    ]
-                ]
             ]
         ],
     ],

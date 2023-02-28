@@ -17,7 +17,7 @@ class MassiveServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
 
         // Controllers
-        $this->app->make('Delfosti\Massive\Controllers\MassiveController');
+        $this->app->make('Delfosti\Massive\Controllers\MassiveUploadController');
         $this->app->make('Delfosti\Massive\Controllers\MassiveUploadLogController');
 
         // Migrations
