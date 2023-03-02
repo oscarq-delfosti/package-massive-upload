@@ -302,6 +302,17 @@ class MassiveUploadService
 
                             // Foreign keys
 
+                            // In flow => Get the value of the foreign keys that are inside the stream
+                            if ($this->hasForeignKeysInFlow($entity)) {
+                                foreach ($entity['foreign_keys']['in_flow'] as $key => $inFlowKey) {
+                                    if (array_key_exists($key, $parentIds)) {
+                                        $parent[$inFlowKey] = $parentIds[$key];
+                                    } else {
+                                        $item[$entity['entity']][0]['errors'][$inFlowKey['search_by']][] = "Parent storage error";
+                                    }
+                                }
+                            }
+
                             // Out flow => Get value of foreign keys that are outside the stream
                             if ($this->hasForeignKeysOutFlow($entity)) {
                                 foreach ($entity['foreign_keys']['out_flow'] as $outFlowKey) {
