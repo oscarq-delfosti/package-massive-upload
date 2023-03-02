@@ -306,9 +306,14 @@ class MassiveUploadService
                             if ($this->hasForeignKeysInFlow($entity)) {
                                 foreach ($entity['foreign_keys']['in_flow'] as $key => $inFlowKey) {
                                     if (array_key_exists($key, $parentIds)) {
+
                                         $parent[$inFlowKey] = $parentIds[$key];
+
                                     } else {
+
                                         $item[$entity['entity']][0]['errors'][$inFlowKey['search_by']][] = "Parent storage error";
+                                        $errors += 1;
+
                                     }
                                 }
                             }
