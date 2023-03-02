@@ -3,7 +3,7 @@
     "description": "Massive Uploader",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.2",
+    "version": "1.0.1",
     "autoload": {
         "psr-4": {
             "Delfosti\\Massive\\": "src/"
