@@ -60,7 +60,15 @@ class ModelService
 
     public function getFields($model)
     {
-        return $model['fields'];
+        if (is_array($model)) {
+            return $model['fields'];
+        }
+
+        if (is_object($model)) {
+            return $model->fields;
+        }
+
+        return [];
     }
 
     public function getValidations($model, $action)

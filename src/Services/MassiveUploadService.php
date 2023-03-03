@@ -322,26 +322,26 @@ class MassiveUploadService
                             if ($this->hasForeignKeysOutFlow($entity)) {
                                 foreach ($entity['foreign_keys']['out_flow'] as $outFlowKey) {
                                     $searchBy = $outFlowKey['search_by'];
+                                    $fkColumn = $outFlowKey['fk_column'];
 
-                                    if (array_key_exists($searchBy, $parent) && $parent[$searchBy] != "") {
+                                    if (array_key_exists($fkColumn, $parent) && $parent[$fkColumn] != "") {
 
                                         // Find item by declared field
                                         $response = $this->databaseService->findByField(
                                             $models[$outFlowKey['entity']]['table_name'],
                                             $searchBy,
-                                            $parent[$searchBy]
+                                            $parent[$fkColumn]
                                         );
 
                                         if (!$response) {
 
-                                            $item[$entity['entity']][0]['errors'][$outFlowKey['search_by']][] = "No item found with this value";
+                                            $item[$entity['entity']][0]['errors'][$fkColumn][] = "No item found with this value";
                                             $errors += 1;
 
                                         } else {
 
                                             // Change the search engine for the database field
-                                            unset($parentItem[$searchBy]);
-                                            $parentItem[$outFlowKey['fk_column']] = $response->id;
+                                            $parent[$fkColumn] = $response->id;
 
                                         }
                                     } else {
@@ -425,25 +425,25 @@ class MassiveUploadService
                                 if ($this->hasForeignKeysOutFlow($entity)) {
                                     foreach ($entity['foreign_keys']['out_flow'] as $outFlowKey) {
                                         $searchBy = $outFlowKey['search_by'];
+                                        $fkColumn = $outFlowKey['fk_column'];
 
-                                        if (array_key_exists($searchBy, $child) && $child[$searchBy] != "") {
+                                        if (array_key_exists($fkColumn, $child) && $child[$fkColumn] != "") {
                                             // Find item by declared field
                                             $response = $this->databaseService->findByField(
                                                 $models[$outFlowKey['entity']]['table_name'],
                                                 $searchBy,
-                                                $child[$searchBy]
+                                                $child[$fkColumn]
                                             );
 
                                             if (!$response) {
 
-                                                $item[$entity['entity']][$keyChild]['errors'][$outFlowKey['search_by']][] = "No item found with this value";
+                                                $item[$entity['entity']][$keyChild]['errors'][$fkColumn][] = "No item found with this value";
                                                 $errors += 1;
 
                                             } else {
 
                                                 // Change the search engine for the database field
-                                                unset($child[$searchBy]);
-                                                $child[$outFlowKey['fk_column']] = $response->id;
+                                                $child[$fkColumn] = $response->id;
 
                                             }
                                         } else {
@@ -584,26 +584,26 @@ class MassiveUploadService
                             if ($this->hasForeignKeysOutFlow($entity)) {
                                 foreach ($entity['foreign_keys']['out_flow'] as $outFlowKey) {
                                     $searchBy = $outFlowKey['search_by'];
+                                    $fkColumn = $outFlowKey['fk_column'];
 
-                                    if (array_key_exists($searchBy, $parent) && $parent[$searchBy] != "") {
+                                    if (array_key_exists($fkColumn, $parent) && $parent[$fkColumn] != "") {
 
                                         // Find item by declared field
                                         $response = $this->databaseService->findByField(
                                             $models[$outFlowKey['entity']]['table_name'],
                                             $searchBy,
-                                            $parent[$searchBy]
+                                            $parent[$fkColumn]
                                         );
 
                                         if (!$response) {
 
-                                            $item[$entity['entity']][0]['errors'][$outFlowKey['search_by']][] = "No item found with this value";
+                                            $item[$entity['entity']][0]['errors'][$fkColumn][] = "No item found with this value";
                                             $errors += 1;
 
                                         } else {
 
                                             // Change the search engine for the database field
-                                            unset($parentItem[$searchBy]);
-                                            $parentItem[$outFlowKey['fk_column']] = $response->id;
+                                            $parent[$fkColumn] = $response->id;
 
                                         }
                                     } else {
