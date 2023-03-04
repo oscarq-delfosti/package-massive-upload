@@ -7,14 +7,21 @@ use ErrorException;
 class ModelService
 {
 
-    const PATH = '\App\Models\\';
-    const MODELS_FOLDER_PATH = '..\..\..\..\..\App\Models\\';
+    private $DS = DIRECTORY_SEPARATOR;
+    private $PATH = '';
+    private $MODELS_FOLDER_PATH = '';
+
+    public function __construct()
+    {
+        $this->PATH = "{$this->DS}App{$this->DS}Models{$this->DS}{$this->DS}";
+        $this->MODELS_FOLDER_PATH = "..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}App{$this->DS}Models{$this->DS}{$this->DS}";
+    }
 
     public function getModels()
     {
         $models = [];
 
-        $files = scandir(dirname(__FILE__) . '\\' . self::MODELS_FOLDER_PATH);
+        $files = scandir(dirname(__FILE__) . $this->DS . $this->MODELS_FOLDER_PATH);
 
         foreach ($files as $file) {
             $fileName = explode('.', $file);
@@ -47,9 +54,9 @@ class ModelService
     public function getPath(string $modelName, string $siteId = null)
     {
         if ($siteId) {
-            return self::PATH . $siteId . '\\' . $modelName;
+            return $this->PATH . $siteId . $this->DS . $this->DS . $modelName;
         } else {
-            return self::PATH . $modelName;
+            return $this->PATH . $modelName;
         }
     }
 
