@@ -13,7 +13,7 @@ class ModelService
 
     public function __construct()
     {
-        $this->PATH = "{$this->DS}App{$this->DS}Models{$this->DS}{$this->DS}";
+        $this->PATH = "\App\Models\\";
         $this->MODELS_FOLDER_PATH = "..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}App{$this->DS}Models{$this->DS}{$this->DS}";
     }
 
