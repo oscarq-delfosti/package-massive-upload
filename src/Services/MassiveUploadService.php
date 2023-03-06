@@ -261,7 +261,7 @@ class MassiveUploadService
     public function hasCustomDeleteOptions($entity)
     {
         if (array_key_exists('delete_options', $entity)) {
-            if (array_key_exists('type', $entity['delete_options']) && array_key_exists('type', $entity['delete_options'])) {
+            if (array_key_exists('type', $entity['delete_options']) && array_key_exists('fields', $entity['delete_options'])) {
                 return true;
             }
         }
