@@ -71,7 +71,7 @@ class PackageConfigurationValidationService
             'entities' => 'required|array',
             'entities.*.entity' => 'required',
             'entities.*.order' => 'required|numeric',
-            'entities.*.type' => 'required|in:parent,type',
+            'entities.*.type' => 'required|in:parent,child',
             'entities.*.search_by' => 'required_if:type,update,delete',
             'entities.*.audit_dates' => 'array',
             'entities.*.delete_options' => 'array',
