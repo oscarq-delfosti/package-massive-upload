@@ -230,6 +230,45 @@ class MassiveUploadService
         return false;
     }
 
+    public function hasCustomAuditDates($entity)
+    {
+        if (array_key_exists('audit_dates', $entity)) {
+            if (!empty($entity['audit_dates'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasIdInEntity($entity)
+    {
+        if (array_key_exists('has_id', $entity)) {
+            if ($entity['has_id'] === true) {
+                return true;
+            }
+
+            if ($entity['has_id'] === false) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
+    }
+
+    public function hasCustomDeleteOptions($entity)
+    {
+        if (array_key_exists('delete_options', $entity)) {
+            if (array_key_exists('type', $entity['delete_options']) && array_key_exists('type', $entity['delete_options'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function uploader($args)
     {
         $action = $this->getActionGlobally($args['action'], $args['domain']);
@@ -328,7 +367,7 @@ class MassiveUploadService
 
                                         // Find item by declared field
                                         $response = $this->databaseService->findByField(
-                                            $models[$outFlowKey['entity']]['table_name'],
+                                            $this->modelService->getTable($models[$outFlowKey['entity']]),
                                             $searchBy,
                                             $parent[$fkColumn]
                                         );
@@ -355,9 +394,9 @@ class MassiveUploadService
 
                             // Validate if entity configuration has custom validations
                             if ($this->hasCustomPackageValidations($entity, 'create')) {
-                                $pValidations = $entity['validations']['create'];
+                                $pValidations = (array) $entity['validations']['create'];
                             } else {
-                                $pValidations = $models[$entity['entity']]['validations']['create'];
+                                $pValidations = $this->modelService->getValidations($models[$entity['entity']], 'create');
                             }
 
                             // Apply validations to the entity
@@ -376,25 +415,29 @@ class MassiveUploadService
 
                                 // Validate if entity configuration has custom validations
                                 if ($this->hasCustomPackageFields($entity)) {
-                                    $fields = $entity['fields'];
+                                    $fields = (array) $entity['fields'];
                                 } else {
-                                    $fields = $models[$entity['entity']]['fields'];
+                                    $fields = $this->modelService->getFields($models[$entity['entity']]);
                                 }
 
                                 // Remove from the object the fields that are not declared in the configuration
                                 $this->generalService->removeDiferentKeys($fields, $parent);
 
                                 if ($this->hasCustomPackageCreatedField($entity)) {
-                                    if (array_key_exists($entity['created'], $parent)) {
-                                        $parent[$entity['created']] = $args['user'];
-                                    }
+                                    $parent[$entity['created']] = $args['user'];
                                 } else {
                                     if (array_key_exists('user_id', $parent)) {
                                         $parent['user_id'] = $args['user'];
                                     }
                                 }
 
-                                $response = DB::table($models[$entity['entity']]['table_name'])->insertGetId($parent);
+                                if ($this->hasCustomAuditDates($entity)) {
+                                    foreach ($entity['audit_dates'] as $auditDate) {
+                                        $parent[$auditDate] = now();
+                                    }
+                                }
+
+                                $response = DB::table($this->modelService->getTable($models[$entity['entity']]))->insertGetId($parent);
 
                                 if (!$response) {
                                     $errors += 1;
@@ -430,7 +473,7 @@ class MassiveUploadService
                                         if (array_key_exists($fkColumn, $child) && $child[$fkColumn] != "") {
                                             // Find item by declared field
                                             $response = $this->databaseService->findByField(
-                                                $models[$outFlowKey['entity']]['table_name'],
+                                                $this->modelService->getTable($models[$outFlowKey['entity']]),
                                                 $searchBy,
                                                 $child[$fkColumn]
                                             );
@@ -456,9 +499,9 @@ class MassiveUploadService
 
                                 // Validate if entity configuration has custom validations
                                 if ($this->hasCustomPackageValidations($entity, 'create')) {
-                                    $pValidations = $entity['validations']['create'];
+                                    $pValidations = (array) $entity['validations']['create'];
                                 } else {
-                                    $pValidations = $models[$entity['entity']]['validations']['create'];
+                                    $pValidations = $this->modelService->getValidations($models[$entity['entity']], 'create');
                                 }
 
                                 // Apply validations to the entity
@@ -477,31 +520,44 @@ class MassiveUploadService
 
                                     // Validate if entity configuration has custom validations
                                     if ($this->hasCustomPackageFields($entity)) {
-                                        $fields = $entity['fields'];
+                                        $fields = (array) $entity['fields'];
                                     } else {
-                                        $fields = $models[$entity['entity']]['fields'];
+                                        $fields = $this->modelService->getFields($models[$entity['entity']]);
                                     }
 
                                     // Remove from the object the fields that are not declared in the configuration
                                     $this->generalService->removeDiferentKeys($fields, $child);
 
                                     if ($this->hasCustomPackageCreatedField($entity)) {
-                                        if (array_key_exists($entity['created'], $parent)) {
-                                            $parent[$entity['created']] = $args['user'];
-                                        }
+                                        $child[$entity['created']] = $args['user'];
                                     } else {
-                                        if (array_key_exists('user_id', $parent)) {
-                                            $parent['user_id'] = $args['user'];
+                                        if (array_key_exists('user_id', $child)) {
+                                            $child['user_id'] = $args['user'];
                                         }
                                     }
 
-                                    $response = DB::table($models[$entity['entity']]['table_name'])->insertGetId($child);
-
-                                    if (!$response) {
-                                        $errors += 1;
-                                    } else {
-                                        $parentIds[$entity['entity']] = $response;
+                                    if ($this->hasCustomAuditDates($entity)) {
+                                        foreach ($entity['audit_dates'] as $auditDate) {
+                                            $child[$auditDate] = now();
+                                        }
                                     }
+
+                                    if ($this->hasIdInEntity($entity)) {
+                                        $response = DB::table($this->modelService->getTable($models[$entity['entity']]))->insertGetId($child);
+
+                                        if (!$response) {
+                                            $errors += 1;
+                                        } else {
+                                            $parentIds[$entity['entity']] = $response;
+                                        }
+                                    } else {
+                                        $response = DB::table($this->modelService->getTable($models[$entity['entity']]))->insert($child);
+
+                                        if (!$response) {
+                                            $errors += 1;
+                                        }
+                                    }
+
                                 }
                             }
                         }
@@ -590,7 +646,7 @@ class MassiveUploadService
 
                                         // Find item by declared field
                                         $response = $this->databaseService->findByField(
-                                            $models[$outFlowKey['entity']]['table_name'],
+                                            $this->modelService->getTable($models[$outFlowKey['entity']]),
                                             $searchBy,
                                             $parent[$fkColumn]
                                         );
@@ -619,7 +675,7 @@ class MassiveUploadService
                             if ($this->hasCustomPackageValidations($entity, 'update')) {
                                 $pValidations = $entity['validations']['update'];
                             } else {
-                                $pValidations = $models[$entity['entity']]['validations']['update'];
+                                $pValidations = $this->modelService->getValidations($models[$entity['entity']], 'update');
                             }
 
                             // Apply validations to the entity
@@ -648,7 +704,7 @@ class MassiveUploadService
                                 // Remove from the object the fields that are not declared in the configuration
                                 $this->generalService->removeDiferentKeys($fields, $parent);
 
-                                $response = DB::table($models[$entity['entity']]['table_name'])
+                                $response = DB::table($this->modelService->getTable($models[$entity['entity']]))
                                     ->where($entity['search_by'], $id)
                                     ->update($parent);
 
@@ -733,7 +789,7 @@ class MassiveUploadService
                             if ($this->hasCustomPackageValidations($entity, 'delete')) {
                                 $pValidations = $entity['validations']['delete'];
                             } else {
-                                $pValidations = $models[$entity['entity']]['validations']['delete'];
+                                $pValidations = $this->modelService->getValidations($models[$entity['entity']], 'delete');
                             }
 
                             // Apply validations to the entity
@@ -752,22 +808,20 @@ class MassiveUploadService
 
                                 $id = $parent[$entity['search_by']];
 
-                                if (array_key_exists('delete', $action) && $action['delete'] != "") {
-                                    if ($action['delete'] == "physically") {
-                                        DB::table($models[$entity['entity']]['table_name'])
+                                if ($this->hasCustomDeleteOptions($entity)) {
+                                    if ($entity['delete_options']['type'] == "physically") {
+                                        DB::table($this->modelService->getTable($models[$entity['entity']]))
                                             ->where($entity['search_by'], $id)
                                             ->delete();
                                     }
 
-                                    if ($action['delete'] == "logically") {
-                                        DB::table($models[$entity['entity']]['table_name'])
+                                    if ($entity['delete_options']['type'] == "logically") {
+                                        DB::table($this->modelService->getTable($models[$entity['entity']]))
                                             ->where($entity['search_by'], $id)
-                                            ->update([
-                                                'deleted_at' => now()
-                                            ]);
+                                            ->update($entity['delete_options']['fields']);
                                     }
                                 } else {
-                                    DB::table($models[$entity['entity']]['table_name'])
+                                    DB::table($this->modelService->getTable($models[$entity['entity']]))
                                         ->where($entity['search_by'], $id)
                                         ->delete();
                                 }

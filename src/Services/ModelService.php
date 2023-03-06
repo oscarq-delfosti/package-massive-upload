@@ -62,17 +62,41 @@ class ModelService
 
     public function getTable($model)
     {
-        return $model['table_name'];
+        if (is_array($model)) {
+            if (array_key_exists('table_name', $model)) {
+                return (string) $model['table_name'];
+            } else {
+                return "";
+            }
+        }
+
+        if (is_object($model)) {
+            if (property_exists($model, 'table_name')) {
+                return (string) $model->table_name;
+            } else {
+                return "";
+            }
+        }
+
+        return "";
     }
 
     public function getFields($model)
     {
         if (is_array($model)) {
-            return $model['fields'];
+            if (array_key_exists('fields', $model)) {
+                return (array) $model['fields'];
+            } else {
+                return [];
+            }
         }
 
         if (is_object($model)) {
-            return $model->fields;
+            if (property_exists($model, 'fields')) {
+                return (array) $model->fields;
+            } else {
+                return [];
+            }
         }
 
         return [];
@@ -80,7 +104,50 @@ class ModelService
 
     public function getValidations($model, $action)
     {
-        return $model['validations'][$action];
+        if (is_array($model)) {
+            if (array_key_exists('validations', $model)) {
+                if (is_array($model['validations'])) {
+                    if (array_key_exists($action, $model['validations'])) {
+                        return (array) $model['validations'][$action];
+                    } else {
+                        return [];
+                    }
+                }
+                if (is_object($model['validations'])) {
+                    if (property_exists($model['validations'], $action)) {
+                        return (array) $model['validations']->$action;
+                    } else {
+                        return [];
+                    }
+                }
+            } else {
+                return [];
+            }
+        }
+
+        if (is_object($model)) {
+            if (property_exists($model, 'validations')) {
+                if (is_array($model->validations)) {
+                    if (array_key_exists($action, $model->validations)) {
+                        return (array) $model->validations[$action];
+                    } else {
+                        return [];
+                    }
+                }
+                if (is_object($model->validations)) {
+                    if (property_exists($model->validations, $action)) {
+                        return (array) $model->validations->$action;
+                    } else {
+                        return [];
+                    }
+                }
+            } else {
+                return [];
+            }
+        }
+
+        return [];
     }
+
 
 }

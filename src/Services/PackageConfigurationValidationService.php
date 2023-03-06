@@ -21,8 +21,8 @@ class PackageConfigurationValidationService
         self::validateApplication();
 
         return new PackageConfigurationValidationResponse(
-                $this->internalFails,
-                $this->internalErrors
+            $this->internalFails,
+            $this->internalErrors
         );
     }
 
@@ -46,7 +46,6 @@ class PackageConfigurationValidationService
                 'actions' => 'required|array',
                 'actions.*.action' => 'required',
                 'actions.*.type' => 'required|in:create,update,delete',
-                'actions.*.delete' => 'in:physically,logically',
                 'actions.*.friendly_name' => 'required',
                 'actions.*.entities' => 'required|array',
                 'actions.*.entities.*.entity' => 'required',
@@ -74,6 +73,10 @@ class PackageConfigurationValidationService
             'entities.*.order' => 'required|numeric',
             'entities.*.type' => 'required|in:parent,type',
             'entities.*.search_by' => 'required_if:type,update,delete',
+            'entities.*.audit_dates' => 'array',
+            'entities.*.delete_options' => 'array',
+            'entities.*.delete_options.type' => 'in:physically,logically',
+            'entities.*.delete_options.fields' => 'array|required_if:entities.*.delete_options.type,logically',
             'entities.*.foreign_keys' => 'array',
             'entities.*.foreign_keys.in_flow' => 'array',
             'entities.*.foreign_keys.out_flow' => 'array',
@@ -90,8 +93,8 @@ class PackageConfigurationValidationService
         }
 
         return new PackageConfigurationValidationResponse(
-                $this->internalFails,
-                $this->internalErrors
+            $this->internalFails,
+            $this->internalErrors
         );
     }
 
