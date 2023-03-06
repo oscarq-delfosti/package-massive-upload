@@ -350,7 +350,7 @@ class MassiveUploadService
 
                                     } else {
 
-                                        $item[$entity['entity']][0]['errors'][$inFlowKey['search_by']][] = "Parent storage error";
+                                        $item[$entity['entity']][0]['errors'][] = "Parent storage error";
                                         $errors += 1;
 
                                     }
