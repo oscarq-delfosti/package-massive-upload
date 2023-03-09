@@ -62,12 +62,23 @@ class MassiveUploadService
 
                     if (!$existsModel) {
                         $fields = [];
+                        $required_fields = [];
                     } else {
                         $model = $models[$entity['entity']];
+                        $actionType = $action['type'];
+
+                        foreach ($model->validations->$actionType as $field => $validation) {
+                            if (str_contains($validation, 'required'))
+                                $required_fields[] = $field;
+                        }
+
                         $fields = $this->modelService->getFields($model);
                     }
 
                     $action['entities'][$key]['fields'] = $fields;
+                    $action['entities'][$key]['required_fields'] = $required_fields;
+
+                    $required_fields = [];
                 }
             }
         }
@@ -283,7 +294,6 @@ class MassiveUploadService
             'type' => $actionType,
             'entities' => json_encode($actionEntities),
             'upload_status' => 'complete',
-            'items' => json_encode($args['items']),
             'user_id' => $args['user']
         ];
 

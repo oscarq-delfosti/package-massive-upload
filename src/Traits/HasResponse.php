@@ -3,6 +3,7 @@
 namespace Delfosti\Massive\Traits;
 
 use Carbon\Carbon;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 trait HasResponse
 {
@@ -23,6 +24,16 @@ trait HasResponse
         ];
 
         return response()->json($data, $data['code']);
+
+    }
+
+    public function defaultStructure($code)
+    {
+        return [
+            'code' => $code,
+            'status' => ($code == 200) ? 'success' : 'fail',
+            'message' => helper_get_status($code),
+        ];
 
     }
 
@@ -50,5 +61,10 @@ trait HasResponse
         $structure["errors"] = $errors;
 
         return response()->json($structure, 422);
+    }
+
+    public function resourceResponse(JsonResource $resource, $code)
+    {
+        return $resource->additional($this->defaultStructure($code));
     }
 }

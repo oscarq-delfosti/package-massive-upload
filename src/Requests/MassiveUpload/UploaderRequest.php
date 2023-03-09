@@ -25,6 +25,7 @@ class UploaderRequest extends FormRequest
     {
         return [
             'action' => 'required',
+            'file_name' => 'required',
             'items' => 'required|array',
             'user' => 'required|numeric'
         ];

@@ -18,9 +18,8 @@ class CreateMassiveUploadLogTable extends Migration
                 $table->id();
                 $table->string('action', 100);
                 $table->string('type', 10);
-                $table->longText('entities');
+                $table->json('entities');
                 $table->enum('upload_status', ['in_progress', 'complete', 'incomplete']);
-                $table->longText('items');
                 $table->integer('user_id');
                 $table->timestamps();
                 $table->softDeletes();

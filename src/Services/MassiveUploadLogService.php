@@ -3,6 +3,7 @@
 namespace Delfosti\Massive\Services;
 
 use Delfosti\Massive\Models\MassiveUploadLog;
+use Delfosti\Massive\Resources\MassiveUploadLogResource;
 
 use Delfosti\Massive\Services\GeneralService;
 
@@ -31,7 +32,7 @@ class MassiveUploadLogService
             return null;
         }
 
-        return $output->toArray();
+        return new MassiveUploadLogResource($output);
     }
 
     public function get($args)
@@ -52,21 +53,18 @@ class MassiveUploadLogService
             $query->select(explode(',', $args['fields']));
         }
 
-        $output = $query
-            ->get()
-            ->toArray();
+        $output = $query->get();
 
         // Validate output
         if ($output === null) {
             return null;
         }
 
-        return $output;
+        return MassiveUploadLogResource::collection($output);
     }
 
     public function list($args)
     {
-
         // Pagination
         $limit = (isset($args['limit']) && $args['limit'] !== '' && $args['limit'] !== NULL) ? $args['limit'] : 0;
 
@@ -79,13 +77,14 @@ class MassiveUploadLogService
         // Filters
         $this->filters($query, $args);
 
-        return $query->paginate(
-            $args["per_page"],
+        $data = $query->paginate(
+            $args["limit"],
             $columns = ['*'],
             $pageName = 'logs',
             $args["page"]
         );
 
+        return MassiveUploadLogResource::collection($data);
     }
 
     public function create($args)
@@ -96,7 +95,6 @@ class MassiveUploadLogService
         $massiveUploadLog->type = $args["type"];
         $massiveUploadLog->entities = $args["entities"];
         $massiveUploadLog->upload_status = $args["upload_status"];
-        $massiveUploadLog->items = $args["items"];
         $massiveUploadLog->user_id = $args["user_id"];
 
         $massiveUploadLog->save();
@@ -104,7 +102,6 @@ class MassiveUploadLogService
 
     private function filters(&$query, $args)
     {
-
         // Filter default
         if (!empty($args['id']))
             $query->whereIn('id', is_array($args['id']) ? $args['id'] : explode(',', $args['id']));

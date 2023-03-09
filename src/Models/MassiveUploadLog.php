@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class MassiveUploadLog extends Model
 {
+    use HasFactory;
+
     protected $table = "massive_upload_log";
 
     protected $fillable = [
@@ -18,5 +20,14 @@ class MassiveUploadLog extends Model
         'user_id'
     ];
 
-    use HasFactory;
+
+    /**
+     * Get the user's full name.
+     *
+     * @return string
+     */
+    public function parseEntities()
+    {
+        return json_decode($this->entities);
+    }
 }

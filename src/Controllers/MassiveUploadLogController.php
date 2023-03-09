@@ -32,7 +32,7 @@ class MassiveUploadLogController extends Controller
             $params = $request->all();
             $response = $this->massiveUploadLogService->show($params);
 
-            return $this->successResponse($response);
+            return $this->resourceResponse($response, 200);
 
         } catch (Error $ex) {
 
@@ -51,7 +51,7 @@ class MassiveUploadLogController extends Controller
             $params = $request->all();
             $response = $this->massiveUploadLogService->get($params);
 
-            return $this->successResponse($response);
+            return $this->resourceResponse($response, 200);
         } catch (Error $ex) {
 
             return $this->exceptionResponse(
@@ -68,7 +68,7 @@ class MassiveUploadLogController extends Controller
             $params = $request->all();
             $response = $this->massiveUploadLogService->list($params);
 
-            return $this->successResponse($response);
+            return $this->resourceResponse($response, 200);
         } catch (Error $ex) {
 
             return $this->exceptionResponse(

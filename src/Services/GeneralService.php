@@ -47,4 +47,15 @@ class GeneralService
             $query->whereBetween($date_field, [$date, $date_end]);
         }
     }
+
+    public function processOutput($code = 200)
+    {
+        $output = [
+            'code' => $code,
+            'status' => ($code == 200) ? 'success' : 'fail',
+            'message' => helper_get_status($code),
+        ];
+
+        return $output;
+    }
 }
