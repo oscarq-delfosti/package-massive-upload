@@ -1,4 +1,6 @@
-# Massive uploader - Laravel Package
+# Laravel Massive uploader
+
+Este es un paquete simple de laravel que agrega la funcionalidad de carga masiva en el proyecto con la finalidad de almacenar datos a una o más entidades a la vez sin necesidad de programar un servicio personalizado para este.
 
 ## Instalación
 
@@ -76,6 +78,72 @@ generar este automaticamente, luego de la instalación deberá ejecutar el coman
 Luego de ejecutar el comando tendrá un nuevo archivo dentro de la carpeta `config/` de su proyecto
 llamado  `massiveupload.php`, este tendrá una estructura base para guiarlo mejor en la implementación.
 
+### Migraciones
+
+El paquete almacena un historial de todas las veces que se ha ejecutado alguna funcionalidad 
+de carga masiva en el sistema, para esto trae un migración que debe ser ejecutada luego de ser instalado. 
+
+```bash
+   php artisan migrate
+``` 
+
+Luego de ejecutar el comando tendrá una nueva tabla en la base de datos de su proyecto llamada `massive_upload_log`.
+
+### Rutas del API
+
+El paquete agrega nuevas rutas al sistema para poder ejecutar sus funcionalidades, estos son los siguientes:
+
+```bash
+   (GET) /api/massive-upload/get-actions
+``` 
+* Devuelve todas las funcionalidades que han sido declaradas en el archivo de configuración del proyecto.
+
+```bash
+  (GET) /api/massive-upload/get-action
+```
+* Devuelve una funcionalidad en específico, támbien devuelve los campos que se usan para el almacenamiento de cada entidad 
+y cuales son obligatorios, para esto se deben envíar los siguientes parametros:
+
+```bash
+    {
+        "action": Nombre de la funcionalidad (string),
+        "entity_fields": Si requiere o no los campos de cada entidad (boolean)
+    }
+``` 
+
+```bash
+  (POST) /api/massive-upload/uploader
+```  
+* Ejecuta la funcionalidad de carga masiva, para esto se deben envíar los siguientes parametros:
+
+```bash
+    {
+        "action": Nombre de la funcionalidad (string),
+        "user": id del usuario que está ejecutando la acción (boolean),
+        "file_name": Nombre del archivo que se está procesando (string),
+        "items": Datos que van a ser procesados (array)
+    }
+``` 
+
+```bash
+   (GET) /api/massive-upload-log/show
+```
+
+* Devuelve un registro del historial de carga masiva, esta busqueda si hace por el campo `id`;
+
+```bash
+   (GET) /api/massive-upload-log/get
+```
+
+* Devuelve un listado de registros del historial de carga masiva;
+
+```bash
+   (GET) /api/massive-upload-log/list
+```
+
+* Devuelve un listado paginado de registros del historial de carga masiva;
+
+
 ### Configuración del proyecto
 
 ```bash
@@ -134,13 +202,27 @@ __Entities:__ Entidades del sistema que serán usadas en esta funcionalidad.
         'entity' => '',
         'order' => 1,
         'type' => '',
+        'has_id' => true,
+        'created' => '',
         'search_by' => '',
-        'finders' => [
-            [
-                'entity' => '',
-                'search_by' => '',
-                'fk_column' => ''
-            ]
+        'audit_dates' => []
+        'foreign_keys' => [
+            'in_flow' => [
+                'Entity' => 'field',
+            ],
+            'out_flow' => [
+                [
+                    'entity' => '',
+                    'search_by' => '',
+                    'fk_column' => ''
+                ]
+            ]     
+        ],
+        'fields' => [],
+        'validations' => [
+            'create' => [],
+            'update' => [],
+            'delete' => []
         ]
     ]
 ``` 
@@ -156,30 +238,55 @@ el paquete soporta dos tipos de entidad:
 - __child:__ Depente de otras entidades que están declaradas en el flujo de la funcionalidad y que tienen que 
         ser ejecutadas antes que esta para su correcto almacenamiento. 
 
+__Has Id:__ Indica si la entidad tiene el campo 'id', esto se usa para validar si el paquete debe obtener el id del dato registrado o no, este campo es opcional y por defecto tiene el valor `true`.
+
+__Created:__ Indica el campo de la entidad que se usa para almacenar el id del usuario que está ejecutando la acción, 
+        este es campo es opcional y por defecto busca la propiedad `user_id` en los campos de la entidad que se está procesando,
+        si este no lo tiene simplemente ignora almacenar este campo y continua el flujo.
+
 __Search by:__ Campo de la entidad por el cual buscará el registro en la base de datos, este solo es 
         requerido para las acciones de tipo `update` y `delete`.
 
-__Finders:__ Son los claves foreneas que necesitan ser almacenadas en la entidad, pero no pertenecen al flujo de
-la funcionalidad. Este campo es de tipo `array` ya que la entidad puede requerir mas de un valor para ser procesada.
+__Audit Dates:__ Son los campos de la entidad en donde se almacena la fecha y hora en que estpa siendo almacenado o actualizado, por ejemplo `created_at`.
 
-#### Configuración de Finders
+__Foreign Keys -> In Flow:__ Son los claves foreneas que necesitan ser almacenadas en la entidad hija y que son obtenidas de las entidades padre que están dentro del flujo de la funcionalidad y que han
+sido procesadas antes que esta, Este campo es de tipo `array` ya que la entidad puede requerir mas de un valor para se procesada.
 
 ```bash
-    'finders' => [
-        [
-            'entity' => '',
-            'search_by' => '',
-            'fk_column' => ''
+    'foreign_keys' => [
+        'in_flow' => [
+            'Entity' => 'field'
+        ]
+    ]
+
+    * Entity: Entidad padre desde donde se obtendrá el id, esta debe estar declarada 
+            dentro de la funcionalidad.
+    * Field: Campo de la entidad hija que requiere el valor.  
+``` 
+
+__Foreign Keys -> Out Flow:__ Son los claves foreneas que necesitan ser almacenadas en la entidad, pero no pertenecen al flujo de
+la funcionalidad. Este campo es de tipo `array` ya que la entidad puede requerir mas de un valor para ser procesada.
+
+```bash
+    'foreign_keys' => [
+        'out_flow' => [
+            [
+                'entity' => Entidad en la que se buscará el registro requerido,
+                'search_by' => Campo de la entidad por el cual buscará el registro en la base de datos,
+                'fk_column' => Campo de la entidad que requiere el valor, este ayuda a identificar el 
+                        campo con el cual se tiene que intercambiar el valor una vez obtenido el registro
+            ]
         ]
     ]
 ``` 
 
-__Entity:__ Entidad en la que se buscará el registro requerido.
+__Fields:__ Campos de la tabla que estarán habilitados para la carga masiva, estos se usan en caso la funcionalidad requiera un almacenamiento personalizado de la entidad. 
+Este es un campo opcional y por defecto el paquete obtendrá los campos que fueron declarados en la configuración del modelo.
 
-__Search by:__ Campo de la entidad por el cual buscará el registro en la base de datos.
+__Validations:__ Validaciones del paquete Laravel Validator que serán usadas para tener un almacenamiento
+mas estricto de datos, estos se usan en caso la funcionalidad requiera validaciones personalizadas para el almacenamiento de la entidad. 
+Este es un campo opcional y por defecto el paquete obtendrá los campos que fueron declarados en la configuración del modelo.
 
-__Fk column:__ Campo de la entidad que requiere el valor, este ayuda a identificar el 
-campo con el cual se tiene que intercambiar el valor una vez obtenido el registro.
 
 ### Configuración de Modelos
 
@@ -189,7 +296,6 @@ Agregar una nueva variable publica en cada modelo que tendrá la opción de real
     public $massiveUpload = [
         'table_name' => '',
         'fields' => [],
-        'foreign_keys' => [],
         'validations' => [
             'create' => [],
             'update' => [],
@@ -201,11 +307,6 @@ Agregar una nueva variable publica en cada modelo que tendrá la opción de real
 __Table name:__ Tabla de la base de datos en la que se almacenarán los elementos enviados. 
 
 __Fields:__ Campos de la tabla que estarán habilitados para la carga masiva. 
-
-__Foreign keys:__ Claves foraneas que serán usadas para identificar a la entidad de tipo `parent` 
-que está declarado en el flujo de una funcionalidad, estas deben ser declaradas de la siguiente forma:
-
-    'Entity' => 'foreign key'
 
 __Validations:__ Validaciones del paquete Laravel Validator que serán usadas para tener un almacenamiento
 mas estricto de datos.
