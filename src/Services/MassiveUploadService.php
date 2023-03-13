@@ -284,6 +284,7 @@ class MassiveUploadService
     {
         $action = $this->getActionGlobally($args['action'], $args['domain']);
 
+        $actionFriendlyName = $action['friendly_name'];
         $actionType = $action['type'];
         $actionEntities = $action['entities'];
 
@@ -291,8 +292,10 @@ class MassiveUploadService
 
         $logArgs = [
             'action' => $args['action'],
+            'friendly_name' => $actionFriendlyName,
             'type' => $actionType,
             'entities' => json_encode($actionEntities),
+            'file_name' => $args['file_name'],
             'upload_status' => 'complete',
             'user_id' => $args['user']
         ];

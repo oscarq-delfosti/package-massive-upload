@@ -17,8 +17,10 @@ class CreateMassiveUploadLogTable extends Migration
             Schema::create('massive_upload_log', function (Blueprint $table) {
                 $table->id();
                 $table->string('action', 100);
+                $table->string('friendly_name', 250);
                 $table->string('type', 10);
                 $table->json('entities');
+                $table->string('file_name', 250);
                 $table->enum('upload_status', ['in_progress', 'complete', 'incomplete']);
                 $table->integer('user_id');
                 $table->timestamps();

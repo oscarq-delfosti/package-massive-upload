@@ -28,6 +28,11 @@ class PackageConfigurationService
         return $this->configFile['application']['microservices'];
     }
 
+    public function getCreatedData()
+    {
+        return $this->configFile['application']['created_data'];
+    }
+
     public function getActions()
     {
         return $this->configFile['actions'];

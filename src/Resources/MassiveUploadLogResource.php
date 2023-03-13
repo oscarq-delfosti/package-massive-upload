@@ -17,9 +17,11 @@ class MassiveUploadLogResource extends JsonResource
         return [
             'id' => $this->id,
             'action' => $this->action,
+            'friendly_name' => $this->friendly_name,
             'entities' => json_decode($this->entities),
             'upload_status' => $this->upload_status,
-            'user_id' => $this->user_id,
+            'file_name' => $this->file_name,
+            'user' => json_decode($this->user),
             'create_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s')
         ];
