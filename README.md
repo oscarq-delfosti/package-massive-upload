@@ -150,7 +150,12 @@ y cuales son obligatorios, para esto se deben envíar los siguientes parametros:
     'application' => [
         'architecture' => '',
         'orchestrator' => '',
-        'microservices' => []
+        'microservices' => [],
+        'created_data' => [
+            'table' => '',
+            'primary_key' => '',
+            'fields'
+        ]
     ],
 ``` 
 
@@ -169,6 +174,12 @@ __Microservices:__ Se deben colocar las URLS de los microservicios que componen 
 
 _Nota_: Para que el paquete funcione correctamente debe ser instalado en todos los servicios que componen el proyecto y todas las acciones 
 deben apuntar al orquestador o aplicación principal.
+
+__Created Data:__ Se debe indicar desde donde el paquete va a obtener los datos del usuario que ha realizado las acciones de carga masiva.
+
+* table: tabla de la base de datos desde donde se obtendrán los datos
+* primary_key: clave primaria de la tabla
+* fields: datos que del usuario que desea mostrar
 
 ### Configuración de funcionalidades
 
