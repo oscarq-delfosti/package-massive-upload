@@ -346,7 +346,7 @@ class MassiveUploadService
                 try {
                     DB::beginTransaction();
 
-                    foreach ($entities as $key => $entity) {
+                    foreach ($entities as $entityKey => $entity) {
 
                         if ($entity['type'] == 'parent') {
 
@@ -356,10 +356,10 @@ class MassiveUploadService
 
                             // In flow => Get the value of the foreign keys that are inside the stream
                             if ($this->hasForeignKeysInFlow($entity)) {
-                                foreach ($entity['foreign_keys']['in_flow'] as $key => $inFlowKey) {
-                                    if (array_key_exists($key, $parentIds)) {
+                                foreach ($entity['foreign_keys']['in_flow'] as $inFlowKey => $inFlowItem) {
+                                    if (array_key_exists($inFlowKey, $parentIds)) {
 
-                                        $parent[$inFlowKey] = $parentIds[$key];
+                                        $parent[$inFlowItem] = $parentIds[$inFlowKey];
 
                                     } else {
 
@@ -372,15 +372,15 @@ class MassiveUploadService
 
                             // Out flow => Get value of foreign keys that are outside the stream
                             if ($this->hasForeignKeysOutFlow($entity)) {
-                                foreach ($entity['foreign_keys']['out_flow'] as $outFlowKey) {
-                                    $searchBy = $outFlowKey['search_by'];
-                                    $fkColumn = $outFlowKey['fk_column'];
+                                foreach ($entity['foreign_keys']['out_flow'] as $outFlowItem) {
+                                    $searchBy = $outFlowItem['search_by'];
+                                    $fkColumn = $outFlowItem['fk_column'];
 
                                     if (array_key_exists($fkColumn, $parent) && $parent[$fkColumn] != "") {
 
                                         // Find item by declared field
                                         $response = $this->databaseService->findByField(
-                                            $this->modelService->getTable($models[$outFlowKey['entity']]),
+                                            $this->modelService->getTable($models[$outFlowItem['entity']]),
                                             $searchBy,
                                             $parent[$fkColumn]
                                         );
@@ -398,7 +398,7 @@ class MassiveUploadService
                                         }
                                     } else {
 
-                                        $item[$entity['entity']][0]['errors'][$outFlowKey['search_by']][] = "The {$outFlowKey['search_by']} field is required";
+                                        $item[$entity['entity']][0]['errors'][$outFlowItem['search_by']][] = "The {$outFlowItem['search_by']} field is required";
                                         $errors += 1;
 
                                     }
@@ -468,9 +468,9 @@ class MassiveUploadService
 
                                 // In flow => Get the value of the foreign keys that are inside the stream
                                 if ($this->hasForeignKeysInFlow($entity)) {
-                                    foreach ($entity['foreign_keys']['in_flow'] as $key => $inFlowKey) {
-                                        if (array_key_exists($key, $parentIds)) {
-                                            $child[$inFlowKey] = $parentIds[$key];
+                                    foreach ($entity['foreign_keys']['in_flow'] as $inFlowKey => $inFlowItem) {
+                                        if (array_key_exists($inFlowKey, $parentIds)) {
+                                            $child[$inFlowItem] = $parentIds[$inFlowKey];
                                         } else {
                                             $item[$entity['entity']][$keyChild]['errors'][] = "Parent storage error";
                                         }
@@ -479,14 +479,14 @@ class MassiveUploadService
 
                                 // Out flow => Get value of foreign keys that are outside the stream
                                 if ($this->hasForeignKeysOutFlow($entity)) {
-                                    foreach ($entity['foreign_keys']['out_flow'] as $outFlowKey) {
-                                        $searchBy = $outFlowKey['search_by'];
-                                        $fkColumn = $outFlowKey['fk_column'];
+                                    foreach ($entity['foreign_keys']['out_flow'] as $outFlowItem) {
+                                        $searchBy = $outFlowItem['search_by'];
+                                        $fkColumn = $outFlowItem['fk_column'];
 
                                         if (array_key_exists($fkColumn, $child) && $child[$fkColumn] != "") {
                                             // Find item by declared field
                                             $response = $this->databaseService->findByField(
-                                                $this->modelService->getTable($models[$outFlowKey['entity']]),
+                                                $this->modelService->getTable($models[$outFlowItem['entity']]),
                                                 $searchBy,
                                                 $child[$fkColumn]
                                             );
@@ -504,7 +504,7 @@ class MassiveUploadService
                                             }
                                         } else {
 
-                                            $item[$entity['entity']][$keyChild]['errors'][$outFlowKey['search_by']][] = "The {$outFlowKey['search_by']} field is required";
+                                            $item[$entity['entity']][$keyChild]['errors'][$outFlowItem['search_by']][] = "The {$outFlowItem['search_by']} field is required";
                                             $errors += 1;
                                         }
                                     }
@@ -651,15 +651,15 @@ class MassiveUploadService
 
                             // Out flow => Get value of foreign keys that are outside the stream
                             if ($this->hasForeignKeysOutFlow($entity)) {
-                                foreach ($entity['foreign_keys']['out_flow'] as $outFlowKey) {
-                                    $searchBy = $outFlowKey['search_by'];
-                                    $fkColumn = $outFlowKey['fk_column'];
+                                foreach ($entity['foreign_keys']['out_flow'] as $outFlowItem) {
+                                    $searchBy = $outFlowItem['search_by'];
+                                    $fkColumn = $outFlowItem['fk_column'];
 
                                     if (array_key_exists($fkColumn, $parent) && $parent[$fkColumn] != "") {
 
                                         // Find item by declared field
                                         $response = $this->databaseService->findByField(
-                                            $this->modelService->getTable($models[$outFlowKey['entity']]),
+                                            $this->modelService->getTable($models[$outFlowItem['entity']]),
                                             $searchBy,
                                             $parent[$fkColumn]
                                         );
@@ -677,7 +677,7 @@ class MassiveUploadService
                                         }
                                     } else {
 
-                                        $item[$entity['entity']][0]['errors'][$outFlowKey['search_by']][] = "The {$outFlowKey['search_by']} field is required";
+                                        $item[$entity['entity']][0]['errors'][$outFlowItem['search_by']][] = "The {$outFlowItem['search_by']} field is required";
                                         $errors += 1;
 
                                     }
