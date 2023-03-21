@@ -157,7 +157,7 @@ class MassiveUploadService
             } else {
                 $response = (new ApiService($orchestrator))->get(
                     'api',
-                    'massive',
+                    'massive-upload',
                     'get-action',
                     null,
                     null,
