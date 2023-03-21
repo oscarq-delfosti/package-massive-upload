@@ -741,11 +741,11 @@ class MassiveUploadService
                 } catch (ErrorException $ex) {
                     DB::rollBack();
                     $item[$entity['entity']][0]['errors'] = [$ex->getMessage(), $ex->getSeverity()];
-                    $data['failed'][$key] = $item;
+                    $data['failed'][] = $item;
                 } catch (QueryException $ex) {
                     DB::rollBack();
                     $item[$entity['entity']][0]['errors'] = [$ex->getMessage(), $ex->getPrevious()];
-                    $data['failed'][$key] = $item;
+                    $data['failed'][] = $item;
                 }
             }
         }
