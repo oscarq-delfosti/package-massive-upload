@@ -9,20 +9,17 @@ use App\Http\Controllers\Controller;
 use Error;
 
 // Services
-use Delfosti\Massive\Services\GeneralService;
 use Delfosti\Massive\Services\MassiveUploadLogService;
 
 class MassiveUploadLogController extends Controller
 {
     use HasResponse;
 
-    private $generalService;
     private $massiveUploadLogService;
 
     public function __construct()
     {
         $this->massiveUploadLogService = new MassiveUploadLogService();
-        $this->generalService = new GeneralService();
     }
 
     public function show(Request $request)
@@ -33,7 +30,6 @@ class MassiveUploadLogController extends Controller
             $response = $this->massiveUploadLogService->show($params);
 
             return $this->resourceResponse($response, 200);
-
         } catch (Error $ex) {
 
             return $this->exceptionResponse(
@@ -41,7 +37,6 @@ class MassiveUploadLogController extends Controller
                 $ex->getLine(),
                 $ex->getCode()
             );
-
         }
     }
 
@@ -76,7 +71,6 @@ class MassiveUploadLogController extends Controller
                 $ex->getLine(),
                 $ex->getCode()
             );
-
         }
     }
 }
