@@ -7,9 +7,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-use Error;
-use Exception;
-
 // Services
 use Delfosti\Massive\Services\PackageConfigurationService;
 use Delfosti\Massive\Services\ModelService;
@@ -163,7 +160,7 @@ class MassiveUploadService
                     null,
                     ['action' => $action]
                 );
-                return $response['data'];
+                return json_decode(json_encode($response['data']->data), true);;
             }
         }
     }
@@ -341,7 +338,6 @@ class MassiveUploadService
                 $item['errors'] = $vStructure->errors();
 
                 $errors += 1;
-
             } else {
                 try {
                     DB::beginTransaction();
@@ -360,12 +356,10 @@ class MassiveUploadService
                                     if (array_key_exists($inFlowKey, $parentIds)) {
 
                                         $parent[$inFlowItem] = $parentIds[$inFlowKey];
-
                                     } else {
 
                                         $item[$entity['entity']][0]['errors'][] = "Parent storage error";
                                         $errors += 1;
-
                                     }
                                 }
                             }
@@ -389,18 +383,15 @@ class MassiveUploadService
 
                                             $item[$entity['entity']][0]['errors'][$fkColumn][] = "No item found with this value";
                                             $errors += 1;
-
                                         } else {
 
                                             // Change the search engine for the database field
                                             $parent[$fkColumn] = $response->id;
-
                                         }
                                     } else {
 
                                         $item[$entity['entity']][0]['errors'][$outFlowItem['search_by']][] = "The {$outFlowItem['search_by']} field is required";
                                         $errors += 1;
-
                                     }
                                 }
                             }
@@ -421,7 +412,6 @@ class MassiveUploadService
                                 $item[$entity['entity']][0]['errors'] = $vParent->errors();
 
                                 $errors += 1;
-
                             } else {
 
                                 // If the element passes the validations
@@ -458,7 +448,6 @@ class MassiveUploadService
                                     $parentIds[$entity['entity']] = $response;
                                 }
                             }
-
                         }
 
                         if ($entity['type'] == 'child') {
@@ -495,12 +484,10 @@ class MassiveUploadService
 
                                                 $item[$entity['entity']][$keyChild]['errors'][$fkColumn][] = "No item found with this value";
                                                 $errors += 1;
-
                                             } else {
 
                                                 // Change the search engine for the database field
                                                 $child[$fkColumn] = $response->id;
-
                                             }
                                         } else {
 
@@ -526,7 +513,6 @@ class MassiveUploadService
                                     $item[$entity['entity']][$keyChild]['errors'][] = $vChild->errors();
 
                                     $errors += 1;
-
                                 } else {
 
                                     // If the element passes the validations
@@ -570,11 +556,9 @@ class MassiveUploadService
                                             $errors += 1;
                                         }
                                     }
-
                                 }
                             }
                         }
-
                     }
 
                     if ($errors > 0) {
@@ -586,7 +570,6 @@ class MassiveUploadService
                     }
 
                     $errors = 0;
-
                 } catch (ErrorException $ex) {
                     DB::rollBack();
                     $item[$entity['entity']][0]['errors'] = [$ex->getMessage(), $ex->getSeverity()];
@@ -636,7 +619,6 @@ class MassiveUploadService
                 $item['errors'] = $vStructure->errors();
 
                 $errors += 1;
-
             } else {
                 try {
                     DB::beginTransaction();
@@ -668,18 +650,15 @@ class MassiveUploadService
 
                                             $item[$entity['entity']][0]['errors'][$fkColumn][] = "No item found with this value";
                                             $errors += 1;
-
                                         } else {
 
                                             // Change the search engine for the database field
                                             $parent[$fkColumn] = $response->id;
-
                                         }
                                     } else {
 
                                         $item[$entity['entity']][0]['errors'][$outFlowItem['search_by']][] = "The {$outFlowItem['search_by']} field is required";
                                         $errors += 1;
-
                                     }
                                 }
                             }
@@ -700,7 +679,6 @@ class MassiveUploadService
                                 $item[$entity['entity']][0]['errors'] = $vParent->errors();
 
                                 $errors += 1;
-
                             } else {
 
                                 // If the element passes the validations
@@ -737,7 +715,6 @@ class MassiveUploadService
                     }
 
                     $errors = 0;
-
                 } catch (ErrorException $ex) {
                     DB::rollBack();
                     $item[$entity['entity']][0]['errors'] = [$ex->getMessage(), $ex->getSeverity()];
@@ -787,7 +764,6 @@ class MassiveUploadService
                 $item['errors'] = $vStructure->errors();
 
                 $errors += 1;
-
             } else {
                 try {
                     DB::beginTransaction();
@@ -814,7 +790,6 @@ class MassiveUploadService
                                 $item[$entity['entity']][0]['errors'] = $vParent->errors();
 
                                 $errors += 1;
-
                             } else {
 
                                 // If the element passes the validations
@@ -851,7 +826,6 @@ class MassiveUploadService
                     }
 
                     $errors = 0;
-
                 } catch (ErrorException $ex) {
                     DB::rollBack();
                     $item[$entity['entity']][0]['errors'] = [$ex->getMessage(), $ex->getSeverity()];
@@ -866,5 +840,4 @@ class MassiveUploadService
 
         return $data;
     }
-
 }
