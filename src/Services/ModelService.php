@@ -13,7 +13,7 @@ class ModelService
 
     public function __construct()
     {
-        $this->PATH = "\App\Models\\";
+        $this->PATH = "{$this->DS}App{$this->DS}Models{$this->DS}{$this->DS}";
         $this->MODELS_FOLDER_PATH = "..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}App{$this->DS}Models{$this->DS}{$this->DS}";
     }
 
@@ -45,7 +45,6 @@ class ModelService
 
             $model = self::getPath($modelName);
             return get_object_vars(new $model)[$property];
-
         } catch (ErrorException $ex) {
             return [];
         }
@@ -148,6 +147,4 @@ class ModelService
 
         return [];
     }
-
-
 }
