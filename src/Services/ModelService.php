@@ -13,8 +13,8 @@ class ModelService
 
     public function __construct()
     {
-        $this->PATH = "{$this->DS}App{$this->DS}Models{$this->DS}";
-        $this->MODELS_FOLDER_PATH = "..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}App{$this->DS}Models{$this->DS}{$this->DS}";
+        $this->PATH = "\App\Models\\";
+        $this->MODELS_FOLDER_PATH = "..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}..{$this->DS}app{$this->DS}Models{$this->DS}{$this->DS}";
     }
 
     public function getModels()
@@ -42,9 +42,8 @@ class ModelService
     public function getModelProperty(string $modelName, $property = "massiveUpload")
     {
         try {
-
             $model = self::getPath($modelName);
-            return get_object_vars(new $model)[$property];
+            return get_object_vars(new $model())[$property];
         } catch (ErrorException $ex) {
             return [];
         }
