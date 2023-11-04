@@ -440,12 +440,20 @@ class MassiveUploadService
                                     }
                                 }
 
-                                $response = DB::table($this->modelService->getTable($models[$entity['entity']]))->insertGetId($parent);
+                                if ($this->hasIdInEntity($entity)) {
+                                    $response = DB::table($this->modelService->getTable($models[$entity['entity']]))->insertGetId($parent);
 
-                                if (!$response) {
-                                    $errors += 1;
+                                    if (!$response) {
+                                        $errors += 1;
+                                    } else {
+                                        $parentIds[$entity['entity']] = $response;
+                                    }
                                 } else {
-                                    $parentIds[$entity['entity']] = $response;
+                                    $response = DB::table($this->modelService->getTable($models[$entity['entity']]))->insert($parent);
+
+                                    if (!$response) {
+                                        $errors += 1;
+                                    }
                                 }
                             }
                         }
