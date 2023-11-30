@@ -380,7 +380,7 @@ class MassiveUploadService
                                         );
 
                                         if (!$response) {
-
+                                            $parent[$fkColumn] = "";
                                             $item[$entity['entity']][0]['errors'][$fkColumn][] = "No item found with this value";
                                             $errors += 1;
                                         } else {
@@ -489,7 +489,7 @@ class MassiveUploadService
                                             );
 
                                             if (!$response) {
-
+                                                $parent[$fkColumn] = "";
                                                 $item[$entity['entity']][$keyChild]['errors'][$fkColumn][] = "No item found with this value";
                                                 $errors += 1;
                                             } else {
@@ -655,7 +655,7 @@ class MassiveUploadService
                                         );
 
                                         if (!$response) {
-
+                                            $parent[$fkColumn] = "";
                                             $item[$entity['entity']][0]['errors'][$fkColumn][] = "No item found with this value";
                                             $errors += 1;
                                         } else {
